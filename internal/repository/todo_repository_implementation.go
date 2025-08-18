@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"todo-list-be/internal/domain"
@@ -36,6 +37,35 @@ func (r *TodoRepositoryImplementation) Save(todo *dto.CreateTodoRequest) (domain
 
 	if err != nil {
 		return domain.Todo{}, fmt.Errorf("failed to create todo: %w", err)
+	}
+
+	return result, nil
+}
+
+func (r *TodoRepositoryImplementation) Update(ctx context.Context, todo *dto.UpdateTodoRequest) (domain.Todo, error) {
+	query := `
+		UPDATE todos
+		SET title = $1,
+			description = $2,
+			completed = $3,
+			priority = $4,
+			due_date = $5,
+			updated_at = NOW()
+		WHERE id = $6
+	`
+
+	var result domain.Todo
+	_, err := r.db.ExecContext(ctx, query,
+		todo.Title,
+		todo.Description,
+		todo.Completed,
+		todo.Priority,
+		todo.DueDate,
+		todo.Id,
+	)
+
+	if err != nil {
+		return domain.Todo{}, fmt.Errorf("failed to update todo: %w", err)
 	}
 
 	return result, nil
