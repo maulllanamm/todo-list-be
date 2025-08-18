@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"todo-list-be/internal/domain"
 	"todo-list-be/internal/dto"
@@ -54,8 +55,7 @@ func (r *TodoRepositoryImplementation) Update(ctx context.Context, todo *dto.Upd
 		WHERE id = $6
 	`
 
-	var result domain.Todo
-	_, err := r.db.ExecContext(ctx, query,
+	res, err := r.db.ExecContext(ctx, query,
 		todo.Title,
 		todo.Description,
 		todo.Completed,
@@ -68,5 +68,10 @@ func (r *TodoRepositoryImplementation) Update(ctx context.Context, todo *dto.Upd
 		return domain.Todo{}, fmt.Errorf("failed to update todo: %w", err)
 	}
 
-	return result, nil
+	rowsAffected, _ := res.RowsAffected()
+	if rowsAffected == 0 {
+		return domain.Todo{}, errors.New("no rows updated")
+	}
+
+	return domain.Todo{}, nil
 }
