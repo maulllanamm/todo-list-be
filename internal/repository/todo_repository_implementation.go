@@ -1,12 +1,13 @@
 package repository
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"todo-list-be/internal/domain"
 	"todo-list-be/internal/dto"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type TodoRepositoryImplementation struct{
@@ -43,7 +44,7 @@ func (r *TodoRepositoryImplementation) Save(todo *dto.CreateTodoRequest) (domain
 	return result, nil
 }
 
-func (r *TodoRepositoryImplementation) Update(ctx context.Context, todo *dto.UpdateTodoRequest) (domain.Todo, error) {
+func (r *TodoRepositoryImplementation) Update(ctx *fiber.Ctx, todo *dto.UpdateTodoRequest) (domain.Todo, error) {
 	query := `
 		UPDATE todos
 		SET title = $1,
@@ -55,13 +56,14 @@ func (r *TodoRepositoryImplementation) Update(ctx context.Context, todo *dto.Upd
 		WHERE id = $6
 	`
 
-	res, err := r.db.ExecContext(ctx, query,
+	c := ctx.UserContext()
+
+	res, err := r.db.ExecContext(c, query,
 		todo.Title,
 		todo.Description,
 		todo.Completed,
 		todo.Priority,
 		todo.DueDate,
-		todo.Id,
 	)
 
 	if err != nil {

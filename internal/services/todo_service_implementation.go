@@ -1,10 +1,11 @@
 package services
 
 import (
-	"context"
 	"todo-list-be/internal/domain"
 	"todo-list-be/internal/dto"
 	"todo-list-be/internal/repository"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 type TodoServiceImplementation struct{
@@ -23,6 +24,6 @@ func (s *TodoServiceImplementation) CreateTodo(request *dto.CreateTodoRequest) (
 	return s.repo.Save(request)
 }
 
-func (s *TodoServiceImplementation) UpdateTodo(ctx context.Context, request *dto.UpdateTodoRequest) (domain.Todo, error){
+func (s *TodoServiceImplementation) UpdateTodo(ctx *fiber.Ctx, request *dto.UpdateTodoRequest) (domain.Todo, error){
 	return s.repo.Update(ctx, request)
 }
