@@ -10,5 +10,6 @@ import (
 
 type TodoService interface{
 	CreateTodo(request *dto.CreateTodoRequest) (domain.Todo, error)
-	UpdateTodo(ctx *fiber.Ctx, request *dto.UpdateTodoRequest) (domain.Todo, error)
+	UpdateTodo(ctx *fiber.Ctx, request *dto.UpdateTodoRequest, id int) (domain.Todo, error)
+	GetTodoById(ctx *fiber.Ctx, id int) (domain.Todo, error)
 }

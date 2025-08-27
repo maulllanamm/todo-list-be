@@ -44,7 +44,7 @@ func (r *TodoRepositoryImplementation) Save(todo *dto.CreateTodoRequest) (domain
 	return result, nil
 }
 
-func (r *TodoRepositoryImplementation) Update(ctx *fiber.Ctx, todo *dto.UpdateTodoRequest) (domain.Todo, error) {
+func (r *TodoRepositoryImplementation) Update(ctx *fiber.Ctx, todo *dto.UpdateTodoRequest, id int) (domain.Todo, error) {
 	query := `
 		UPDATE todos
 		SET title = $1,
@@ -64,6 +64,7 @@ func (r *TodoRepositoryImplementation) Update(ctx *fiber.Ctx, todo *dto.UpdateTo
 		todo.Completed,
 		todo.Priority,
 		todo.DueDate,
+		id,
 	)
 
 	if err != nil {
@@ -76,4 +77,31 @@ func (r *TodoRepositoryImplementation) Update(ctx *fiber.Ctx, todo *dto.UpdateTo
 	}
 
 	return domain.Todo{}, nil
+}
+
+func(r *TodoRepositoryImplementation) GetById(ctx *fiber.Ctx, id int) (domain.Todo, error){
+	query := `SELECT * FROM todos WHERE id = $1`
+
+	c := ctx.UserContext()
+
+	var todo domain.Todo
+	err := r.db.QueryRowContext(c, query, id).Scan(		
+		&todo.Id,
+		&todo.Title,
+		&todo.Description,
+		&todo.Completed,
+		&todo.Priority,
+		&todo.DueDate,
+		&todo.CreatedAt,
+		&todo.UpdatedAt,
+	)
+
+	if err != nil{
+		if err == sql.ErrNoRows {
+            return todo, errors.New("todo is not found")
+        }
+		return todo, err
+	}
+
+	return todo, nil
 }

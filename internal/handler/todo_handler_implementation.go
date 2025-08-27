@@ -70,7 +70,7 @@ func(s *TodoHandlerImplementation) CreateTodo(c *fiber.Ctx) error{
 
 func(s *TodoHandlerImplementation) UpdateTodo(c *fiber.Ctx) error{
 	idParam := c.Params("id")
-	_, err := strconv.Atoi(idParam)
+	id, err := strconv.Atoi(idParam)
 	if err != nil{
 		msg := "ID Must be a number"
 		response := dto.APIResponse{
@@ -101,7 +101,7 @@ func(s *TodoHandlerImplementation) UpdateTodo(c *fiber.Ctx) error{
 		DueDate:     request.DueDate,
 	}
 
-	updated, err := s.service.UpdateTodo(c, &todo)
+	updated, err := s.service.UpdateTodo(c, &todo, id)
 	if err != nil {
 		msg := err.Error()
 		response := dto.APIResponse{
@@ -131,4 +131,37 @@ func(s *TodoHandlerImplementation) UpdateTodo(c *fiber.Ctx) error{
 
 	return c.Status(fiber.StatusCreated).JSON(response)
 
+}
+
+func(s *TodoHandlerImplementation) GetTodoById(c *fiber.Ctx) error{
+	idParam := c.Params("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil{
+		msg := "ID Must be a number"
+		response := dto.APIResponse{
+			Success: false,
+			Message: "Failed to convert param",
+			Error:   &msg,
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	todoResponse, err := s.service.GetTodoById(c, id)
+	if err != nil{
+		msg := err.Error()
+		response := dto.APIResponse{
+			Success: false,
+			Message: "Failed to get todo",
+			Error:   &msg,
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	response := dto.APIResponse{
+		Success: true,
+		Message: "OK",
+		Data:    todoResponse,
+	}
+
+	return c.Status(fiber.StatusAccepted).JSON(response)
 }

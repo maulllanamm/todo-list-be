@@ -29,6 +29,8 @@ func main(){
 	// Todo routes
 	todos := api.Group("/todos")
 	todos.Post("/", todoHandler.CreateTodo)
+	todos.Put("/:id", todoHandler.UpdateTodo)
+	todos.Get("/:id", todoHandler.GetTodoById)
 
 	app.Listen(":3000")
 }

@@ -9,5 +9,6 @@ import (
 
 type TodoRepository interface{
 	Save(todo *dto.CreateTodoRequest) (domain.Todo, error)
-	Update(ctx *fiber.Ctx, todo *dto.UpdateTodoRequest) (domain.Todo, error)
+	Update(ctx *fiber.Ctx, todo *dto.UpdateTodoRequest, id int) (domain.Todo, error)
+	GetById(ctx *fiber.Ctx, id int) (domain.Todo, error)
 }
